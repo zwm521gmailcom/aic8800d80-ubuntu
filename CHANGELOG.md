@@ -1,5 +1,19 @@
 # Changelog / 修改记录
 
+## 2026-08-25 — Ubuntu software upgrade note
+
+- Ubuntu reported no remaining package updates and requested a reboot.
+- Kernel `7.0.0-30-generic` is installed, and DKMS reports the AIC module built
+  for it.
+- The machine was still running `6.17.0-14-generic` during inspection, so the
+  new kernel remains pending runtime validation after reboot.
+
+## 2026-08-25 — Ubuntu 软件升级记录
+
+- Ubuntu 已完成软件升级，并提示需要重启。
+- `7.0.0-30-generic` 已安装，DKMS 已为该内核编译 AIC 模块。
+- 检查时系统仍运行 `6.17.0-14-generic`，因此新内核需要重启后再做实测。
+
 ## 2026-08-25 — Ubuntu 24.04.4, kernel 6.17 validation
 
 - Confirmed the tested adapter enumerates as `a69c:5721`, then `a69c:8d80`, and
