@@ -44,7 +44,7 @@ include the Windows executable or redistribute firmware binaries.
 On Ubuntu, connect Ethernet temporarily if the machine has no working network:
 
 ```bash
-git clone https://github.com/REPLACE_WITH_YOUR_ACCOUNT/aic8800d80-ubuntu.git
+git clone https://github.com/zwm521gmailcom/aic8800d80-ubuntu.git
 cd aic8800d80-ubuntu
 sudo bash install-aic8800d80-ubuntu.sh
 ```
