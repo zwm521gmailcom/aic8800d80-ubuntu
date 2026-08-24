@@ -1,5 +1,6 @@
-# AIC8800D80 tested mass-storage stage: eject the virtual driver disk.
-KERNEL=="sd*", ATTRS{idVendor}=="a69c", ATTRS{idProduct}=="5721", SYMLINK+="aic8800d80-disk", RUN+="/usr/bin/eject /dev/%k"
+# The pinned upstream installer already ejects the tested a69c:5721 virtual
+# disk from its aic.rules file. Keep only the device-scoped Wi-Fi binding here
+# so the same disk is not ejected twice.
 
 # Operational Wi-Fi interface. The upstream firmware-loader handles the combo
 # device's Bluetooth interfaces; bind interface 2 to the Wi-Fi driver.
