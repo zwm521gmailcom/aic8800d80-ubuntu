@@ -4,8 +4,23 @@ set -Eeuo pipefail
 
 readonly UPSTREAM_REPO="${AIC8800_REPO_URL:-https://github.com/shenmintao/aic8800d80.git}"
 readonly UPSTREAM_BRANCH="${AIC8800_BRANCH:-legacy-mcu1}"
+UPSTREAM_REF="${AIC8800_REF:-}"
+if [[ -z "${UPSTREAM_REF}" ]]; then
+  case "${UPSTREAM_BRANCH}" in
+    legacy-mcu1) UPSTREAM_REF="4b717f40489f94988713474eb3bd7d75ba83b292" ;;
+    main) UPSTREAM_REF="2895da26d8fe35bcec7483705d44c02c39e018fe" ;;
+    *)
+      echo '未知上游分支；请同时设置 AIC8800_REF 固定提交。' >&2
+      echo 'Unknown upstream branch; set AIC8800_REF to a pinned commit.' >&2
+      exit 1
+      ;;
+  esac
+fi
+readonly UPSTREAM_REF
 readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 readonly LOG_FILE="${PWD}/aic8800d80-install-$(date +%Y%m%d-%H%M%S).log"
+readonly UPSTREAM_DKMS_NAME="aic8800"
+readonly UPSTREAM_DKMS_VERSION="1.0.0"
 TEMP_DIR=""
 
 cleanup() {
@@ -33,7 +48,7 @@ if [[ ${EUID} -eq 0 ]]; then SUDO=(); else SUDO=(sudo); fi
 exec > >(tee -a "${LOG_FILE}") 2>&1
 
 echo '=== AIC8800D80 Ubuntu installer / Ubuntu 安装器 ==='
-echo "Upstream / 上游: ${UPSTREAM_REPO} (${UPSTREAM_BRANCH})"
+echo "Upstream / 上游: ${UPSTREAM_REPO} (${UPSTREAM_BRANCH} @ ${UPSTREAM_REF})"
 echo "Kernel / 内核: $(uname -r)"
 echo "Log / 日志: ${LOG_FILE}"
 
@@ -57,8 +72,38 @@ echo 'Installing packages / 安装依赖……'
 "${SUDO[@]}" apt-get install -y git dkms build-essential "linux-headers-$(uname -r)" \
   usb-modeswitch usb-modeswitch-data sg3-utils bluez usbutils rfkill network-manager
 
+legacy_dkms_versions=()
+while IFS= read -r dkms_line; do
+  if [[ "${dkms_line}" =~ ^${UPSTREAM_DKMS_NAME}/([^,]+), ]]; then
+    dkms_version="${BASH_REMATCH[1]}"
+    if [[ "${dkms_version}" != "${UPSTREAM_DKMS_VERSION}" ]]; then
+      legacy_dkms_versions+=("${dkms_version}")
+    fi
+  fi
+done < <("${SUDO[@]}" dkms status -m "${UPSTREAM_DKMS_NAME}" 2>/dev/null || true)
+
+if ((${#legacy_dkms_versions[@]} > 0)); then
+  echo "检测到旧 AIC DKMS 版本 / Older AIC DKMS versions detected: ${legacy_dkms_versions[*]}"
+  if [[ "${AIC8800_REMOVE_LEGACY_DKMS:-0}" != 1 ]]; then
+    echo '为避免同名内核模块覆盖，安装已停止。' >&2
+    echo 'Installation stopped to avoid conflicting kernel-module ownership.' >&2
+    echo '确认旧版本无须保留后，使用：' >&2
+    echo "  sudo env AIC8800_REMOVE_LEGACY_DKMS=1 bash ${SCRIPT_DIR}/install-aic8800d80-ubuntu.sh" >&2
+    exit 3
+  fi
+  for dkms_version in "${legacy_dkms_versions[@]}"; do
+    echo "移除旧 DKMS / Removing old DKMS: ${UPSTREAM_DKMS_NAME}/${dkms_version}"
+    "${SUDO[@]}" dkms remove -m "${UPSTREAM_DKMS_NAME}" -v "${dkms_version}" --all
+  done
+fi
+
 TEMP_DIR="$(mktemp -d -t aic8800d80.XXXXXX)"
 git clone --depth 1 --branch "${UPSTREAM_BRANCH}" "${UPSTREAM_REPO}" "${TEMP_DIR}/aic8800d80"
+if ! git -C "${TEMP_DIR}/aic8800d80" cat-file -e "${UPSTREAM_REF}^{commit}" 2>/dev/null; then
+  git -C "${TEMP_DIR}/aic8800d80" fetch --depth 1 origin "${UPSTREAM_REF}"
+fi
+git -C "${TEMP_DIR}/aic8800d80" checkout --detach "${UPSTREAM_REF}"
+echo "Pinned upstream commit / 已固定上游提交: ${UPSTREAM_REF}"
 
 echo 'Running upstream installer / 运行上游安装器……'
 "${SUDO[@]}" bash "${TEMP_DIR}/aic8800d80/install.sh"
