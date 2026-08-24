@@ -8,6 +8,17 @@ validated on an Ubuntu 24.04.4 amd64 system with kernel 6.17.0-14-generic.
 DKMS/udev 集成和蓝牙兼容方案。测试环境为 Ubuntu 24.04.4 amd64、
 `6.17.0-14-generic` 内核。
 
+### Upgrade note / 升级提示
+
+The test machine has installed Ubuntu kernel `7.0.0-30-generic` through a
+software update. DKMS has built the AIC module for that kernel, but the machine
+is still running `6.17.0-14-generic`; `7.0.0-30-generic` is not marked as
+runtime-validated until after a reboot and a fresh diagnostic report.
+
+测试机通过系统软件升级安装了 `7.0.0-30-generic` 内核，DKMS 也已为该内核
+编译模块。但当前仍运行 `6.17.0-14-generic`；重启并重新生成检测报告前，
+不能把新内核标记为“已实测兼容”。
+
 ## Hardware / 硬件识别
 
 The adapter is sold under many names such as “Wi-Fi 6 USB adapter” or “AX5400
