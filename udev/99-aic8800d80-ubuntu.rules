@@ -1,0 +1,6 @@
+# AIC8800D80 tested mass-storage stage: eject the virtual driver disk.
+KERNEL=="sd*", ATTRS{idVendor}=="a69c", ATTRS{idProduct}=="5721", SYMLINK+="aic8800d80-disk", RUN+="/usr/bin/eject /dev/%k"
+
+# Operational Wi-Fi interface. The upstream firmware-loader handles the combo
+# device's Bluetooth interfaces; bind interface 2 to the Wi-Fi driver.
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="368b", ATTR{idProduct}=="8d81", ATTR{bInterfaceClass}=="ff", RUN+="/bin/sh -c 'modprobe aic8800_fdrv; echo 368b 8d81 > /sys/bus/usb/drivers/aic8800_fdrv/new_id 2>/dev/null || true'"
