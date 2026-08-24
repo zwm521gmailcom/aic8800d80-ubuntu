@@ -1,0 +1,6 @@
+# AIC8800D80 tested virtual-disk stage.
+DefaultVendor=0xa69c
+DefaultProduct=0x5721
+TargetVendor=0xa69c
+TargetProduct=0x8d80
+StandardEject=1
