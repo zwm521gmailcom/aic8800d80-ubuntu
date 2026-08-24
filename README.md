@@ -42,7 +42,8 @@ command to an unconfirmed device. Run `lsusb` first.
   branch, the tested modeswitch rule, and udev binding rule.
 - `verify-aic8800d80.sh` — read-only post-install diagnostic report.
 - `udev/99-aic8800d80-ubuntu.rules` — ejects the virtual disk and binds the Wi-Fi
-  interface after the device reaches `368b:8d81`.
+  interface after the device reaches `368b:8d81`; the pinned upstream rule owns
+  virtual-disk ejection so it is not duplicated here.
 - `usb_modeswitch/a69c:5721` — switches the tested `a69c:5721` disk stage to
   `a69c:8d80`.
 - `CHANGELOG.md` — kernel and Bluetooth fixes found during testing.
@@ -61,10 +62,24 @@ sudo bash install-aic8800d80-ubuntu.sh
 ```
 
 The default upstream branch is `legacy-mcu1`, selected for devices that report
-`chip_id=7, chip_mcu_id=1`. For a device with `chip_mcu_id=0`, use:
+`chip_id=7, chip_mcu_id=1`. The installer pins the tested upstream commit
+`4b717f40489f94988713474eb3bd7d75ba83b292`.
+
+For a device with `chip_mcu_id=0`, use the pinned current `main` commit:
 
 ```bash
-sudo AIC8800_BRANCH=main bash install-aic8800d80-ubuntu.sh
+sudo env AIC8800_BRANCH=main AIC8800_REF=2895da26d8fe35bcec7483705d44c02c39e018fe \
+  bash install-aic8800d80-ubuntu.sh
+```
+
+That `main` path is not covered by the `chip_mcu_id=1` validation above. If an
+older DKMS package is already installed (for example `aic8800/radxa`), the
+installer stops rather than silently letting two packages own the same kernel
+module. Review `dkms status`, then explicitly migrate only when the old package
+is no longer needed:
+
+```bash
+sudo env AIC8800_REMOVE_LEGACY_DKMS=1 bash install-aic8800d80-ubuntu.sh
 ```
 
 拔掉网卡，等待约 5 秒，再插回。切换完成后，检查：
@@ -108,6 +123,8 @@ scan on
 3. **Bluetooth HCI timeout** — remove any old custom `aic_btusb` rule/module,
    keep standard `btusb` plus `aic_zlp_quirk`, and physically replug.
 4. **Kernel update** — rebuild/reinstall DKMS modules for the new kernel.
+   If the installer reports an older `aic8800/*` DKMS version, follow its
+   migration prompt instead of running it repeatedly.
 
 Generate a report without changing the system:
 
