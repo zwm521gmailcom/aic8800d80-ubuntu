@@ -1,0 +1,4 @@
+*.log
+aic8800d80-install-*.log
+*.swp
+.DS_Store
