@@ -2,22 +2,23 @@
 
 Ubuntu integration files for AIC8800D80 USB adapters. This repository records the
 working USB-mode switch, DKMS/udev integration, and Bluetooth compatibility path
-validated on an Ubuntu 24.04.4 amd64 system with kernel 6.17.0-14-generic.
+validated on an Ubuntu 24.04.4 amd64 system with kernels
+`6.17.0-14-generic` and `7.0.0-30-generic`.
 
 本项目为 AIC8800D80 USB 网卡提供 Ubuntu 集成文件，记录已验证的 USB 模式切换、
 DKMS/udev 集成和蓝牙兼容方案。测试环境为 Ubuntu 24.04.4 amd64、
-`6.17.0-14-generic` 内核。
+`6.17.0-14-generic` 和 `7.0.0-30-generic` 内核。
 
 ### Upgrade note / 升级提示
 
-The test machine has installed Ubuntu kernel `7.0.0-30-generic` through a
-software update. DKMS has built the AIC module for that kernel, but the machine
-is still running `6.17.0-14-generic`; `7.0.0-30-generic` is not marked as
-runtime-validated until after a reboot and a fresh diagnostic report.
+The test machine installed Ubuntu kernel `7.0.0-30-generic` through a software
+update and has now been rebooted and verified on it. Wi-Fi auto-connected,
+Bluetooth was present, `aic8800_fdrv` and `aic_zlp_quirk` loaded, and eight
+gateway pings completed with 0% packet loss.
 
-测试机通过系统软件升级安装了 `7.0.0-30-generic` 内核，DKMS 也已为该内核
-编译模块。但当前仍运行 `6.17.0-14-generic`；重启并重新生成检测报告前，
-不能把新内核标记为“已实测兼容”。
+测试机通过系统软件升级安装了 `7.0.0-30-generic` 内核，随后已重启并完成
+实测：Wi‑Fi 自动连接、蓝牙存在，`aic8800_fdrv` 和 `aic_zlp_quirk` 均已加载，
+网关 8 次 Ping 丢包率为 0%。
 
 ## Hardware / 硬件识别
 
