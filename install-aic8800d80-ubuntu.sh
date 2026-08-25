@@ -73,10 +73,12 @@ echo 'Installing packages / 安装依赖……'
   usb-modeswitch usb-modeswitch-data sg3-utils bluez usbutils rfkill network-manager
 
 legacy_dkms_versions=()
+declare -A legacy_dkms_seen=()
 while IFS= read -r dkms_line; do
   if [[ "${dkms_line}" =~ ^${UPSTREAM_DKMS_NAME}/([^,]+), ]]; then
     dkms_version="${BASH_REMATCH[1]}"
-    if [[ "${dkms_version}" != "${UPSTREAM_DKMS_VERSION}" ]]; then
+    if [[ "${dkms_version}" != "${UPSTREAM_DKMS_VERSION}" && -z "${legacy_dkms_seen[${dkms_version}]+seen}" ]]; then
+      legacy_dkms_seen["${dkms_version}"]=1
       legacy_dkms_versions+=("${dkms_version}")
     fi
   fi
