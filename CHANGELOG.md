@@ -5,8 +5,25 @@
 - Ubuntu reported no remaining package updates and requested a reboot.
 - Kernel `7.0.0-30-generic` is installed, and DKMS reports the AIC module built
   for it.
-- The machine was still running `6.17.0-14-generic` during inspection, so the
-  new kernel remains pending runtime validation after reboot.
+- The machine was still running `6.17.0-14-generic` during the initial
+  inspection; the reboot validation is recorded in the entry below.
+
+## 2026-08-25 — Ubuntu 7.0 runtime validation
+
+- Rebooted into `7.0.0-30-generic` and confirmed DKMS `aic8800/1.0.0` is
+  installed for the running kernel.
+- The adapter enumerated as `368b:8d81`; USB interface 2 bound to
+  `aic8800_fdrv`, while Bluetooth interfaces used `btusb`.
+- `aic_zlp_quirk` loaded successfully and a Bluetooth controller was present.
+- Wi-Fi auto-connected to the saved `ChinaNet-QCgn-5G` profile at approximately
+  567/600 Mbps negotiated rate; eight gateway pings completed with 0% loss.
+
+## 2026-08-25 — Ubuntu 7.0 重启实测
+
+- 已重启进入 `7.0.0-30-generic`，确认运行内核对应的 DKMS `aic8800/1.0.0` 已安装。
+- 网卡识别为 `368b:8d81`，USB 接口 2 使用 `aic8800_fdrv`，蓝牙接口使用 `btusb`。
+- `aic_zlp_quirk` 加载成功，蓝牙控制器存在。
+- Wi‑Fi 自动连接已保存的 `ChinaNet-QCgn-5G`，协商速率约 567/600 Mbps；网关 8 次 Ping 丢包 0%。
 
 ## 2026-08-25 — Ubuntu 软件升级记录
 
@@ -14,7 +31,7 @@
 - `7.0.0-30-generic` 已安装，DKMS 已为该内核编译 AIC 模块。
 - 上游 `drivers/aic8800` 已针对 `7.0.0-30-generic` 完成编译；构建时的 GCC
   版本提示属于编译器差异警告，不等于编译失败。
-- 检查时系统仍运行 `6.17.0-14-generic`，因此新内核需要重启后再做实测。
+- 初次检查时系统仍运行 `6.17.0-14-generic`；重启实测记录见下方条目。
 
 ## 2026-08-25 — Installer hardening / 安装器加固
 
